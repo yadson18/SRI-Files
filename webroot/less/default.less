@@ -1,0 +1,121 @@
+.default-styles() {   
+    @import "mixin.less";
+
+    * {
+        .margin(0);
+        .padding(0);
+    }
+    fieldset legend { 
+        .font-size(1.3em); 
+    }
+    label { 
+        .color(#444); 
+    }
+    #debug-screen {
+        .background-color(#ffef00);
+        .border(solid 1px #ccc);
+        .margin(15px 0);
+        .font-size(1em);
+    }
+    .alert { 
+        .text-align(center); 
+    }
+    .close { 
+        .font-size(16px); 
+    }
+    .btn-lg, .btn, .form-control { 
+        .border-radius(2px); 
+    }
+    .modal-content { 
+        .border-radius(4px); 
+    }
+    .content { 
+        .font-family(sans-serif, Helvetica Neue, Helvetica, Arial;); 
+        .font-size(13px);
+    }
+    .icon-left, .icon-right {
+        .position(relative);
+        
+        .icon {
+            .position(absolute);
+            .bottom(0);
+            .color(#777);
+            .z-index(600);
+            .padding(10px 15px);
+        }
+        .icon.icon-sm {
+            .padding(8px 15px);
+        }
+        .icon.button {
+            .cursor(pointer);
+
+            &:hover {
+                .color(#225589);
+                .font-size(13.5px);
+            }
+            &:active {
+                .color(#777);
+                .font-size(1em);
+            }
+        }
+        .icon.success {
+            .color(#3c763d);
+        }
+        .icon.danger {
+            .color(#a94442);
+        }
+    }
+    .icon-right {
+        .icon {
+            .right(0);
+        }
+        .icon.col-icon {
+            .right(0.8em);
+        }
+        input {
+            .padding-right(35px);
+        }
+    }
+    .icon-left {
+        .icon {
+            .left(0);
+        }
+        .icon.col-icon {
+            .left(0.8em);
+        }
+        input {
+            .padding-left(35px);
+        }
+    }
+    .loading {
+        .position(absolute);  
+        .top(4.2em); 
+        .background-color(white);
+        .z-index(1000);
+
+        .loading-content {
+            .width(1000px); 
+            .vertical-align(middle); 
+            .display(table-cell); 
+            .padding(10px);
+        }
+    }
+
+    /* Animations */
+    @keyframes rotate {
+        0% { 
+            .transform(perspective(0) rotateY(0deg)); 
+        } 
+        100% { 
+            .transform(perspective(400px) rotateY(360deg)); 
+        }
+    }
+    @keyframes slideArrow {
+        0% { 
+            .transform(translate(0)); 
+        } 
+        100% { 
+            .transform(translate(2px)); 
+        }
+    }
+}

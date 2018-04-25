@@ -1,0 +1,17 @@
+#!/bin/bash
+# yadson20@gmail.com
+#
+# This script initialize a native PHP server on port 9000.
+#	Note: Only to development ambient.
+
+ROOT=$(pwd);
+
+WEBROOT_PATH=$ROOT/webroot;
+
+if [ $# -eq 1 ] && [ "$1" == start ]; then
+	cd $WEBROOT_PATH;
+   	php -S localhost:9000
+else 
+	echo "Wrong option, try again.";
+	echo "Avaliable option (start)";
+fi

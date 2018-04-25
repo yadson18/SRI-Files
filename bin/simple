@@ -1,0 +1,264 @@
+#!/bin/bash
+# yadson20@gmail.com
+#
+# Script to create project classes (Table, Entity, Controller).
+#	Note: File '.classCreator.sql' will be necessary.
+
+ROOT=$(pwd);
+
+TEMPLATES_PATH=$ROOT/vendor/Simple/src/Template;
+
+SRC_PATH=$ROOT/src;
+
+CONTROLLER_PATH=$SRC_PATH/Controller;
+
+MODEL_PATH=$SRC_PATH/Model;
+
+VIEW_PATH=$SRC_PATH/Template;
+
+WEBROOT_PATH=$ROOT/webroot;
+
+function getClassName(){ 
+	# $1 - Class name.
+
+	if [ $# -eq 1 ]; then
+		className=$(echo "$1" | sed -r 's/\b(\w)(\w*)\b/\U\1\L\2/g');
+		
+		if [ $? -ne 1 ]; then
+			echo $className;
+		else
+			echo 0;
+		fi
+	else
+		echo 0;
+	fi
+}
+
+function makeClassController(){
+	# $1 - Table name.
+	
+	if [ $# -eq 1 ]; then
+		className=$(getClassName $1);
+
+		if [ "$className" != 0 ]; then
+			controller=$(sed -r "s/%controller_name%/$className/g" $TEMPLATES_PATH/Controller.php > $CONTROLLER_PATH/$className'Controller.php');
+
+			if [ $? -ne 1 ]; then
+				echo 1;
+			else
+				echo 0;
+			fi
+		else
+			echo 0;
+		fi
+	else
+		echo 0;
+	fi
+}
+
+function makeClassEntity(){
+	# $1 - Table name.
+
+	className=$(getClassName $1);
+
+	if [ $# -eq 1 ]; then
+		if [ $className != 0 ]; then 
+			entity=$(sed -r "s/%entity_name%/$className/g" $TEMPLATES_PATH/Entity.php > $MODEL_PATH/Entity/$className'.php');
+
+			if [ $? -ne 1 ]; then
+				echo 1;
+			else
+				echo 0;
+			fi
+		else
+			echo 0;
+		fi
+	else
+		echo 0;
+	fi
+}
+
+function makeClassTable(){
+	if [ $# -eq 4 ]; then
+		tableName=$1;
+		tableAttributes=$2;
+		databaseProfile=$3;
+		primaryKeys=$4;
+		className=$(getClassName $tableName);
+
+		if [ $className != 0 ]; then 
+			if [ "$primaryKeys" == "<null>" ]; then
+				primaryKeys="";
+			fi
+
+			table=$(sed -e "s/%table_name%/$className/g" -e "s/%table_attributes%/$tableAttributes/g" -e "s/%db_profile%/$databaseProfile/g" -e "s/%table%/$tableName/g" -e "s/%primary_key%/$primaryKeys/g" $TEMPLATES_PATH/Table.php > $MODEL_PATH/Table/$className'Table.php');
+			
+			if [ $? -ne 1 ]; then
+				echo 1;
+			else
+				echo 0;
+			fi
+		else
+			echo 0;
+		fi
+	else
+		echo 0;
+	fi
+}
+
+function makeViewDir(){
+	# $1 - Table name.
+
+	if [ $# -eq 1 ]; then
+		cd $VIEW_PATH;
+		dirName=$(getClassName $1);
+		
+		if [ "$dirName" != 0 ]; then 
+			
+			if [ -e $dirName ]; then
+				echo 0;
+			else
+				mkdir $dirName;
+
+				echo 1;
+			fi
+		else
+			echo 0;
+		fi
+	else
+		echo 0;
+	fi
+}
+
+function findFile(){
+	# $1 - File name on path bin.
+
+	if [ $# -eq 1 ]; then
+		if [ -e $ROOT/bin/$1 ]; then
+			echo 1;
+		else
+			echo 0;
+		fi
+	else
+		echo 0;
+	fi
+}
+
+function getFileQuery(){
+	# $1 - Table name.
+	# $2 - File name.
+
+	if [ $# -eq 2 ]; then
+		fileExists=$(findFile $2);
+
+		if [ $fileExists -eq 1 ]; then
+			fileContent=$(sed -r "s/%table_name%/$1/g" bin/$2);
+
+			if [ "$fileContent" != 0 ]; then
+				echo $fileContent;
+			else
+				echo 0;
+			fi
+		else
+			echo 0;
+		fi
+	else
+		echo 0;	
+	fi
+}
+
+function getTableAttributes(){
+	# $1 - Database name.
+	# $2 - File content name.
+	# $3 - File query name.
+
+	if [ $# -eq 3 ]; then
+		queryResult=$(/opt/firebird/bin/isql "localhost:/BD/$1.FDB" -ch 'UTF-8' -i $2 -o $3 -u SYSDBA -p masterkey -page 1000000);
+
+		if [ $? -ne 1 ]; then
+			sed -i -e '/^$\|METHOD\|0:\|=/d' $3;
+			result=$(cat $3);
+
+			if [ "$result" != "" ]; then
+				echo 1;
+			else
+				echo 0;
+			fi
+		else
+			echo 0;
+		fi
+	else
+		echo 0;
+	fi
+}
+
+if [ $# -eq 3 ] && [ "$1" == mclasses ] && [ "$2" != "" ] && [ "$3" != "" ]; then
+	fileContent=$(mktemp);
+	fileQuery=$(mktemp);
+
+	databaseName=$2;
+	tableName=$3;  
+
+	content=$(getFileQuery $tableName .classCreator.sql);
+
+	if [ "$content" != 0 ]; then
+		echo $content > $fileContent;
+
+		attributesExists=$(getTableAttributes $databaseName $fileContent $fileQuery);
+
+		if [ "$attributesExists" != 0 ]; then
+			arrayTop=0;
+			attributes="";
+			primaryKeys="";
+			result=$(cat $fileQuery);
+
+			for line in `echo $result`; do
+				if [ $arrayTop -eq 0 ]; then
+					primaryKeys=$line;
+					arrayTop=`expr $arrayTop + 1`;
+				else
+					attributes="$attributes\n\t\t\t$line";
+				fi
+			done
+			
+			ControllerClass=$(makeClassController $tableName);
+			TableClass=$(makeClassTable $tableName "$attributes" $databaseName $primaryKeys);
+			EntityClass=$(makeClassEntity $tableName);
+			ViewDirectoryClass=$(makeViewDir $tableName);
+			className=$(getClassName $tableName);
+
+			echo "========================================================";
+			echo "=                     CLASS CREATOR                    =";
+			echo -e "========================================================\n";
+
+			if [ "$ControllerClass" -eq 1 ]; then 
+				echo -e " - Controller: "$className"Controller -> created (YES)    \n";
+
+				if [ "$TableClass" -eq 1 ]; then
+					echo -e " - Table: "$className"Table -> created (YES)              \n";
+
+					if [ "$EntityClass" -eq 1 ]; then
+						echo -e " - Entity: "$className" -> created (YES)                  \n";
+
+						if [ "$ViewDirectoryClass" -eq 1 ]; then
+							echo " - Directory Template: "$className" -> created (YES)      ";
+						else 
+							echo " - Directory Template: "$className" -> created (NO)   ";
+						fi
+					else 
+						echo -e " - Entity: "$className" -> created (NO)               \n";
+					fi
+				else
+					echo -e " - Table: "$className"Table -> created (NO)           \n";
+				fi
+			else 
+				echo -e " - Controller: "$className"Controller -> created (NO) \n";
+			fi
+
+			echo -e "\n========================================================";
+		fi
+	fi
+else
+	echo "Wrong option, try again.";
+	echo "Avaliable option (mclasses)";
+fi

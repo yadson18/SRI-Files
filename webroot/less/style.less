@@ -1,0 +1,48 @@
+@import 'default.less';
+
+.default-styles();
+
+#main-menu {
+	.border-radius(0) !important;
+	.background-color(#444);
+
+	.navbar-brand, ul li a {
+		.margin(12px 0px 12px 0px) !important;
+	}
+	.navbar-toggle {
+		.margin(20px 15px 12px 0px) !important;
+
+		&:hover {
+			.background-color(white) !important;
+
+			.icon-bar {
+				.background-color(#444) !important;
+			}
+		}
+		.icon-bar {
+			.background-color(white) !important;
+		}
+	}
+	a {
+		.padding-bottom(3px) !important;
+		.color(white) !important;
+	}
+	ul li a {
+		.border-bottom(double 3px transparent);
+		.font-family(Montserrat, sans-serif;);
+
+		&:hover {
+			.border-bottom(solid 3px #f1871a) !important;
+		}
+	}
+}
+form {
+	.form-header {
+		.border-bottom(solid 1px #ccc);
+		.margin-bottom(15px);
+
+		h1, h2, h3, h4, h5, h6 {
+			.color(#555);
+		}
+	}
+}
