@@ -14,15 +14,23 @@
 				$resultado = $this->Usuario->validaLogin($this->request->getData());
 
 				if (isset($resultado->razao)) {
-					return $this->redirect(['controller' => 'Nfce', 'view' => 'index']);
+					$this->Auth->setUser($resultado);
+					
+					return $this->redirect($this->Auth->loginRedirect());
 				}
 				$this->Flash->error($resultado);
 			}
 			$this->setTitle('Login');
 		}
 
+		public function logout()
+		{
+			$this->Auth->destroy();
+			return $this->redirect($this->Auth->logoutRedirect());
+		}
+
 		public function beforeFilter()
 		{
-			$this->Auth->isAuthorized([]);
+			$this->Auth->isAuthorized(['logout']);
 		}
 	}

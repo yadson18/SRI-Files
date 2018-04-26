@@ -11,6 +11,9 @@
     label { 
         .color(#444); 
     }
+    input[type=checkbox], input[type=radio] {
+        .vertical-align(bottom) !important;
+    }
     #debug-screen {
         .background-color(#ffef00);
         .border(solid 1px #ccc);
@@ -30,8 +33,11 @@
         .border-radius(4px); 
     }
     .content { 
-        .font-family(sans-serif, Helvetica Neue, Helvetica, Arial;); 
-        .font-size(13px);
+        .font-family(sans-serif, Helvetica Neue, Helvetica, Arial;) !important; 
+        .font-size(13px) !important;
+    }
+    .list-shown {
+        .margin(27px 10px 10px) !important;
     }
     .icon-left, .icon-right {
         .position(relative);

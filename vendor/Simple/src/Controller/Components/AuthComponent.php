@@ -11,12 +11,12 @@
 			
 			$this->initialize([
 				'login' => [
-					'controller' => 'Page', 
-					'view' => 'home'
+					'controller' => 'Nfce', 
+					'view' => 'index'
 				],
 				'logout' => [
-					'controller' => 'Page', 
-					'view' => 'index'
+					'controller' => 'Usuario', 
+					'view' => 'login'
 				]
 			]);
 		}

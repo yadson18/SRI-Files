@@ -37,11 +37,11 @@
     			<div class='collapse navbar-collapse' id='menu'>
 					<?php if ($this->fetch('controller') !== 'Usuario'): ?>
 				      	<ul class='nav navbar-nav navbar-right'>
-					        <li><a href='#'>ABOUT</a></li>
-					        <li><a href='#'>SERVICES</a></li>
-					        <li><a href='#'>PORTFOLIO</a></li>
-					        <li><a href='#'>PRICING</a></li>
-					        <li><a href='#'>CONTACT</a></li>
+					        <li>
+					        	<a href='/Usuario/logout'>
+					        		SAIR <i class='fas fa-sign-out-alt'></i>
+					        	</a>
+					        </li>
 				      	</ul>
 					<?php endif ?>
     			</div>
