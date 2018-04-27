@@ -42,7 +42,8 @@
 	        	'table' => [],
 	        	'set' => [],
 	        	'where' => []
-	        ]
+	        ],
+	        'query' => null
 	    ];
 
 		private $values = [];
@@ -60,6 +61,14 @@
 				$this->insertQuery('fields', 0, implode(', ', $fieldsToGet));
 			}
 
+			return $this;
+		}
+
+		public function query(string $query)
+		{
+			$this->setQueryType('query');
+			$this->parts['query'] = $query;
+			
 			return $this;
 		}
 
@@ -274,6 +283,8 @@
 							break;
 					}
 					break;
+				case 'query':
+					return $statement->fetchAll();
 				default:
 					switch ($fetchType) {
 						case 'rowCount':
@@ -328,6 +339,9 @@
 					$queryString .= ' ' . implode(' ', mergeSubArrays(
 						$this->parts[$queryType], 7, sizeof($this->parts[$queryType])
 					));
+					break;
+				case 'query':
+					$queryString = $this->parts[$queryType];
 					break;
 				default:
 					$queryString .= ' ' . implode(' ', mergeSubArrays(

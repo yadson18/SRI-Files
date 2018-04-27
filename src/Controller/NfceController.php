@@ -14,6 +14,13 @@
 			$empresa = $this->Auth->getUser('seq');
 			$nfce = null;
 
+			/*$query = $this->Nfce->query('
+					select * 
+					from nfce 
+					where seq in(15, 29)
+				')
+				->fetch('all');*/
+
 			$this->Paginator->showPage($pagina)
 				->buttonsLink('/Nfce/index/pagina/')
 				->itensTotalQuantity(
@@ -45,12 +52,16 @@
 			if ($this->request->is('GET')) {
 				if (is_numeric($seq)) {
 					$this->Nfce->baixarArquivoUnico($seq);
+					$this->Ajax->response('download', ['resposta' => 'ok']);
 				}
 			}
-			/*if ($this->request->is('POST')) {
+			if ($this->request->is('POST')) {
 				$dados = $this->request->getData();
 
-				if (isset($dados['quantidade']) && is_numeric($dados['quantidade']) &&
+				$this->Nfce->baixarArquivoUnico($dados['seq']);
+				$this->Ajax->response('download', ['resposta' => 'ok']);
+
+				/*if (isset($dados['quantidade']) && is_numeric($dados['quantidade']) &&
 					isset($dados['seq']) && is_numeric($dados['seq'])
 				) {
 					if ($dados['quantidade'] === 1 && is_numeric($dados['seq'])) {
@@ -62,8 +73,8 @@
 					else {
 						return true;
 					}
-				}
-			}*/
+				}*/
+			}
 		}
 
 		public function beforeFilter()
