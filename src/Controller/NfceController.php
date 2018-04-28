@@ -14,19 +14,12 @@
 			$empresa = $this->Auth->getUser('seq');
 			$nfce = null;
 
-			/*$query = $this->Nfce->query('
-					select * 
-					from nfce 
-					where seq in(15, 29)
-				')
-				->fetch('all');*/
-
 			$this->Paginator->showPage($pagina)
 				->buttonsLink('/Nfce/index/pagina/')
 				->itensTotalQuantity(
 					$this->Nfce->contarNotas($empresa)->quantidade
 				)
-				->limit(6);
+				->limit(21);
 
 			if ($identificador === 'pagina') {
 				$nfce = $this->Nfce->listarNotas(

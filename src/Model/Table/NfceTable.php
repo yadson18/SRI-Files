@@ -62,6 +62,16 @@
 			}
 		}
 
+		public function baixarArquivoZip(array $seqs)
+		{
+			$query = $this->Nfce->query('
+					select * 
+					from nfce 
+					where seq in(' . implode(',', $seqs) . ')'
+				)
+				->fetch('all');
+		}
+
 		public function contarNotas(int $empresa)
 		{
 			return $this->find([])
