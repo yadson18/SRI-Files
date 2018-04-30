@@ -10,6 +10,10 @@
 
 		public function login()
 		{
+			if ($this->Auth->getUser()) {
+				return $this->redirect('home');
+			}
+
 			if ($this->request->is('POST')) {
 				$resultado = $this->Usuario->validaLogin($this->request->getData());
 

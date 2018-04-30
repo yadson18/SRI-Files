@@ -42,34 +42,67 @@
 				->fetch('all');
 		}
 
-		public function baixarArquivoUnico(int $seq)
+		public function baixarXML(int $seq)
 		{
 			$nfce = $this->get($seq);
-			/*$caminho = preg_split('/[\\\\\/]/i', $nfce->caminho);
-			$arquivoNome = array_pop($caminho);*/
-
-			if ($nfce) {
+			
+			if ($nfce && file_exists($nfce->caminho)) {
 			   	header('Content-Description: File Transfer');
-			    header('Content-Disposition: attachment; filename="' . $nfce->numero_nf . '.php"');
+			    header('Content-Disposition: attachment; filename="' . $nfce->chave . '-NFCE.XML"');
 			    header('Content-Type: application/octet-stream');
 			    header('Content-Transfer-Encoding: binary');
-			    header('Content-Length: ' . filesize('index.php'));
+			    header('Content-Length: ' . filesize($nfce->caminho));
 			    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 			    header('Pragma: public');
 			    header('Expires: 0');
 			   
-			    readfile('index.php');
+			    readfile($nfce->caminho);
 			}
 		}
 
-		public function baixarArquivoZip(array $seqs)
+		public function baixarZip(array $seqs)
 		{
-			$query = $this->Nfce->query('
+			$nfce = $this->query('
 					select * 
 					from nfce 
 					where seq in(' . implode(',', $seqs) . ')'
 				)
 				->fetch('all');
+
+			if (sizeof($nfce) === sizeof($seqs)) {
+				$arquivoNome = 'NFCE-' . rand() . '-' . date('d-m-Y_H-i-s') . '.zip'; 
+				$tmpDir = WWW_ROOT . 'files' . DS;
+				$zip = new \ZipArchive;
+
+				if ($zip->open($tmpDir . $arquivoNome, \ZipArchive::CREATE)) {
+					foreach ($nfce as $arquivo) {
+						if (file_exists($arquivo['caminho'])) {
+							$zip->addFile($arquivo['caminho'], $arquivo['chave']);
+						}
+					}
+					$zip->close();
+
+					if (file_exists($tmpDir . $arquivoNome)) {
+						header('Content-Type: application/zip');
+					    header('Content-Disposition: attachment; filename="' . $arquivoNome . '"');
+					    
+					    readfile($tmpDir . $arquivoNome);
+					    unlink($tmpDir . $arquivoNome);
+
+						/*header('Content-Description: File Transfer');
+					    header('Content-Disposition: attachment; filename="' . $arquivoNome . '"');
+					    header('Content-Type: application/octet-stream');
+					    header('Content-Transfer-Encoding: binary');
+					    header('Content-Length: ' . filesize($tmpDir . $arquivoNome));
+					    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+					    header('Pragma: public');
+					    header('Expires: 0');
+					   
+					    readfile($tmpDir . $arquivoNome);
+					    unlink($tmpDir . $arquivoNome);*/
+					}					
+				}
+			}
 		}
 
 		public function contarNotas(int $empresa)

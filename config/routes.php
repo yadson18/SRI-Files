@@ -9,5 +9,6 @@
  	 *		(@string) view - View name.
 	 */
 	Router::configRoutes([
-		'default' => ['controller' => 'Usuario', 'view' => 'login']
+		'default' => ['controller' => 'Usuario', 'view' => 'login'],
+		'home' => ['controller' => 'Nfce', 'view' => 'index']
 	]);

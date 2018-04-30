@@ -41,32 +41,25 @@
 
 		public function download($seq = null)
 		{
-
-			if ($this->request->is('GET')) {
-				if (is_numeric($seq)) {
-					$this->Nfce->baixarArquivoUnico($seq);
-					$this->Ajax->response('download', ['resposta' => 'ok']);
-				}
-			}
 			if ($this->request->is('POST')) {
 				$dados = $this->request->getData();
 
-				$this->Nfce->baixarArquivoUnico($dados['seq']);
-				$this->Ajax->response('download', ['resposta' => 'ok']);
-
-				/*if (isset($dados['quantidade']) && is_numeric($dados['quantidade']) &&
-					isset($dados['seq']) && is_numeric($dados['seq'])
+				if (isset($dados['qtd']) && is_numeric($dados['qtd']) &&
+					isset($dados['seqs']) && is_array($dados['seqs'])
 				) {
-					if ($dados['quantidade'] === 1 && is_numeric($dados['seq'])) {
-						$this->Nfce->baixarArquivoUnico($dados['seq']);
+					$dados['qtd'] = (int) $dados['qtd'];
+
+					if ($dados['qtd'] === 1) {
+						$this->Nfce->baixarXML(array_shift($dados['seqs']));
 					}
-					else if($dados['quantidade'] > 1) {
-						return true;
+					else if ($dados['qtd'] > 1) {
+						$this->Nfce->baixarZip($dados['seqs']);
+						$this->Ajax->response('download', ['resposta' => 'ok']);
 					}
-					else {
-						return true;
-					}
-				}*/
+				}
+			}
+			else {
+				return $this->redirect('home');
 			}
 		}
 

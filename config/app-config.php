@@ -66,7 +66,7 @@
 			'BANCO' => [
 				'driver' => 'Firebird',
 				'host' => 'localhost',		 
-				'path' => '/BD/BANCO.FDB',  
+				'path' => 'C:\DB\BANCO.FDB',  
 				'user' => 'SYSDBA',
 				'password' => 'masterkey',
 				'encoding' => 'utf-8'
