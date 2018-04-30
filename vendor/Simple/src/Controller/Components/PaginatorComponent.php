@@ -200,8 +200,12 @@
 
 		public function getTotalPages()
 		{
-			return (int) ceil(
-				$this->getTotalQuantity() / $this->getListQuantity()
-			);
+			if (is_numeric($this->getTotalQuantity()) && 
+				is_numeric($this->getListQuantity())
+			) {
+				return (int) ceil(
+					$this->getTotalQuantity() / $this->getListQuantity()
+				);
+			}
 		}
 	}

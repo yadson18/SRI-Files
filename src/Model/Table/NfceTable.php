@@ -17,9 +17,9 @@
 			$this->setBelongsTo('', []);
 		}
 
-		public function listarNotas(int $empresa, int $quantity = null, int $skipTo = null)
+		protected function queryPadrao() 
 		{
-			$nfce = $this->find([
+			return $this->find([
 				'seq', 'chave', 'modelo', 'serie', 'numero_nf',
         		"case cancelado
            			when 'I' then 'Inutilizado'
@@ -29,6 +29,11 @@
    				'data_aut as data_evento', 'hora_aut as hora_evento',
    				'data_rec as data_backup', 'hora_rec as hora_backup'
 			]);
+		}
+
+		public function listarNotas(int $empresa, int $quantity = null, int $skipTo = null)
+		{
+			$nfce = $this->queryPadrao();
 
 			if (!empty($quantity)) {
 				$nfce->limit($quantity);
@@ -39,6 +44,18 @@
 				
 			return $nfce->orderBy(['serie', 'numero_nf'])
 				->where(['empresa =' => $empresa])
+				->fetch('all');
+		}
+
+		public function filtroPorData(int $empresa, string $dataInicio, string $dataFim)
+		{
+			return  $this->queryPadrao()
+				->orderBy(['serie', 'numero_nf'])
+				->where([
+					'empresa =' => $empresa, 'and',
+					'data_aut >=' => $dataInicio, 'and',
+					'data_aut <=' => $dataFim
+				])
 				->fetch('all');
 		}
 

@@ -1,11 +1,43 @@
 <div id='nfce-index' class='container-fluid'>
-	<?php if ($nfce): ?>
-		<div class='col-sm-12 form-group'>
+	<div class='col-sm-12 form-group'>
+		<div class='pull-right form-group'>
+			<button class='btn btn-primary' id='mark-all'>
+				Marcar todas
+				<i class='fas fa-check'></i>
+			</button>
+			<button class='btn btn-danger' id='unmark-all'>
+				Desmarcar todas
+				<i class='fas fa-times'></i>
+			</button>
 			<button class='btn btn-success' id='download-zip' disabled>
 				Baixar notas selecionadas
 				<i class='fas fa-download'></i>
 			</button>
 		</div>
+		<div>
+			<form class='form-inline'>
+				<div class='form-group'>
+					<label>Filtro <i class='fas fa-filter'></i>: </label>
+				</div>
+				<div class='form-group'>
+					&nbsp;
+					<label>Data inicial</label> 
+					<input class='form-control date' placeholder='EX:10/01/2018' id='inicio'>
+				</div>
+				<div class='form-group'>
+					&nbsp;
+					<label>Data final</label> 
+					<input class='form-control date' placeholder=EX:<?= date('d/m/Y') ?> id='fim'>
+				</div>
+				<div class='form-group'>
+					<button class='btn btn-primary' type='button' id='find'>
+						<i class='fas fa-search'></i>
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<?php if ($nfce): ?>
 		<?php foreach ($nfce as $arquivo): ?>
 			<div class='card col-md-4 col-sm-6'>
 				<div id=<?= $arquivo['seq'] ?> class='card-content'>
@@ -61,136 +93,17 @@
 				</div>
 			</div>
 		<?php endforeach ?>
+	<?php else: ?>
+		<div id='nothing-found' class='text-center'>
+			<h3>
+				<i class='far fa-frown'></i> Nenhuma nota foi encontrada.
+			</h3>
+			<a href='/Nfce/index' class='btn btn-primary'>
+				<i class='fas fa-angle-double-left'></i> Clique aqui para retornar
+			</a>
+		</div>
 	<?php endif ?>
 	<div class='col-sm-12'>
 		<?= $this->Paginator->display(); ?>
 	</div>
 </div>
-<script type='text/javascript'>
-	$(document).ready(function() {
-		function baixaArquivo(dados) {
-			if (dados.quantidade && dados.sequenciais && dados.arquivo) {
-				if (dados.arquivo.nome && dados.arquivo.tipo) {
-					$.ajax({
-						url: '/Nfce/download',
-		        		xhrFields: { responseType: 'blob' },
-		        		data: { 
-		        			qtd: dados.quantidade, 
-		        			seqs: dados.sequenciais 
-		        		},
-						method: 'POST'
-					})
-					.done(function(data, status) {
-						//console.log(data);
-						//'text/plain'
-						//octet//stream
-						var url = window.URL.createObjectURL(new Blob([data], {
-					    	type: dados.arquivo.tipo
-					    }));
-						var $a = document.createElement('a');
-					    document.body.appendChild($a);
-
-					    $a.download = dados.arquivo.nome;
-					    $a.style = 'display: none';
-					    $a.href = url;
-					    $a.click();
-
-					    window.URL.revokeObjectURL(url);
-					});
-				}
-			}
-		}
-
-		var sequenciais = [];
-
-		function filaDownload(acao, sequencial) {
-			if (acao === 'adicionar') {
-				if (sequenciais.indexOf(sequencial) === -1) {
-					sequenciais.push(sequencial);
-				}
-			}
-			else if (acao === 'remover') {
-				if (sequenciais.indexOf(sequencial) > -1) {
-					sequenciais.splice(sequenciais.indexOf(sequencial), 1);
-				}
-			}
-		}
-
-		$('.download-xml').on('click', function() {
-			var nomeArquivo = $(this).attr('id');
-			var sequenciais = [$(this).val()];
-
-			baixaArquivo({
-				quantidade: 1,  
-				sequenciais: sequenciais,
-				arquivo: {
-					nome: nomeArquivo,
-					tipo: 'text/html'
-				}
-			});
-		});
-
-
-		$('.card-select').on('change', function() {
-			if (!$(this).prop('checked')) {
-				filaDownload('remover', $(this).val());
-			}
-			else {
-				filaDownload('adicionar', $(this).val());
-			}
-
-			if ($('.card-select:checked').length > 1) {
-				$('#download-zip').off('click').on('click', function() {
-					baixaArquivo({
-						quantidade: sequenciais.length,  
-						sequenciais: sequenciais,
-						arquivo: {
-							nome: 'NFCE.zip',
-							tipo: 'application/zip'
-						}
-					});
-
-
-					//baixaArquivo(sequenciais.length, sequenciais, 'NFCE.zip');
-				})
-				.prop('disabled', false);
-			}
-			else {
-				$('#download-zip').off('click').prop('disabled', true);
-			}
-		});
-
-
-		/*$('#select-notes').on('click', function() {
-			$('.card-select').toggleClass('hidden');
-			$('#download-selected').toggleClass('hidden');
-		});*/
-
-		/*$filesId = {};
-		
-		
-
-		$('#select-notes').on('click', function() {
-			$.ajax({
-				url: '/Nfce/download',
-				method: 'POST',
-        		xhrFields: {
-            		responseType: 'blob'
-        		},
-        		data: { seq: 15 }
-			})
-			.done(function(data, status) {
-				var a = document.createElement('a');
-            	var url = window.URL.createObjectURL(data);
-            	a.href = url;
-            	a.download = 'myfile.pdf';
-            	a.click();
-            	window.URL.revokeObjectURL(url);
-
-				console.log(data);
-			});
-
-			$(this).attr('href', '/Nfce/download/15');
-		});*/
-	});
-</script>

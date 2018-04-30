@@ -10,12 +10,13 @@
 
 		<?= $this->Html->css('bootstrap.min.css') ?>
 		<?= $this->Html->css('fontawesome-all.min.css') ?>
+		<?= $this->Html->css('jquery-datetimepicker.min.css') ?>
 		
 		<?= $this->Html->script('jquery.min.js') ?>
 		<?= $this->Html->script('bootstrap.min.js') ?>
 		<?= $this->Html->script('jquery-mask.min.js') ?>
 		<?= $this->Html->script('jquery-datetimepicker.min.js') ?>
-		<?= $this->Html->script('internal-functions.js') ?>
+		<?= $this->Html->script('scripts.js') ?>
 
 		<?= $this->Html->less('mixin.less') ?>
 		<?= $this->Html->less('style.less') ?>

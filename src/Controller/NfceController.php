@@ -8,26 +8,35 @@
 			return $this->allow([]);
 		}
 
-		public function index($identificador = null, $pagina = 1)
+		public function index($identificador = null, $pagina = 1, $dataInicio = null, $dataFim = null)
 		{
 			$pagina = (is_numeric($pagina) && $pagina > 0) ? $pagina : 1;
 			$empresa = $this->Auth->getUser('seq');
 			$nfce = null;
 
-			$this->Paginator->showPage($pagina)
+			$paginator = $this->Paginator->showPage($pagina)
 				->buttonsLink('/Nfce/index/pagina/')
 				->itensTotalQuantity(
 					$this->Nfce->contarNotas($empresa)->quantidade
-				)
-				->limit(21);
+				);
 
-			if ($identificador === 'pagina') {
+			if ($identificador === 'filtro') {
+				$nfce = $this->Nfce->filtroPorData(
+					$empresa, date('Y-m-d', strtotime($dataInicio)), 
+					date('Y-m-d', strtotime($dataFim))
+				);
+			}
+			else if ($identificador === 'pagina') {
+				$paginator->limit(21);
+
 				$nfce = $this->Nfce->listarNotas(
 					$empresa, $this->Paginator->getListQuantity(), 
 					$this->Paginator->getStartPosition()
 				);
 			}
 			else {
+				$paginator->limit(21);
+
 				$nfce = $this->Nfce->listarNotas(
 					$empresa, $this->Paginator->getListQuantity()
 				);
